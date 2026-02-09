@@ -54,7 +54,7 @@ public class CreateShopMenu extends ChestMenu {
         ItemStack itemStack;
         for (int i = 0 + ((pagenum - 1) * 35); i < ShopManager.stores.size(); i++)
         {
-            if (i >= 36+ ((pagenum - 1) * 35)) break;
+            if (i >= 36 + ((pagenum - 1) * 35)) break;
 
             itemStack = new ItemStack(Items.PLAYER_HEAD);
             itemStack.set(DataComponents.ITEM_NAME, s.getPlayerList().getPlayer(ShopManager.stores.get(i).player).getName());
@@ -62,8 +62,14 @@ public class CreateShopMenu extends ChestMenu {
             this.container.addItem(itemStack);
         }
 
-        Item i = (BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("minecraft", "red_wool")));
+        Item i = (BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("minecraft", "blue_wool")));
         ItemStack is = new ItemStack(i, 1);
+        is.set(DataComponents.ITEM_NAME, Utils.Chat("&fExit"));
+        is.set(CustomComponent.STRING_ID, "Exit");
+        this.container.setItem(49, is);
+
+        i = (BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("minecraft", "red_wool")));
+        is = new ItemStack(i, 1);
         is.set(DataComponents.ITEM_NAME, Utils.Chat("&fPrevious"));
         is.set(CustomComponent.STRING_ID, "Previous");
         this.container.setItem(45, is);
@@ -83,13 +89,13 @@ public class CreateShopMenu extends ChestMenu {
         ItemStack is = new ItemStack(it, 1);
         is.set(DataComponents.ITEM_NAME, Utils.Chat("&fExit"));
         is.set(CustomComponent.STRING_ID, "Exit");
-        this.container.setItem(45, is);
+        this.container.setItem(49, is);
 
         it = (BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("minecraft", "red_wool")));
         is = new ItemStack(it, 1);
         is.set(DataComponents.ITEM_NAME, Utils.Chat("&fPrevious"));
         is.set(CustomComponent.STRING_ID, "Previous");
-        this.container.setItem(47, is);
+        this.container.setItem(45, is);
 
         it = (BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("minecraft", "green_wool")));
         is = new ItemStack(it, 1);
@@ -171,6 +177,12 @@ public class CreateShopMenu extends ChestMenu {
                 inShop = false;
                 curShop = null;
                 displayPage(player.getServer());
+            }
+            else
+            {
+                this.container.clearContent();
+                this.curShop = null;
+                player.closeContainer();
             }
         }
         else {

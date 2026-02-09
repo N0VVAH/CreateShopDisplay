@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.torchednova.CreateShopDisplay.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "CreatePlacementMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

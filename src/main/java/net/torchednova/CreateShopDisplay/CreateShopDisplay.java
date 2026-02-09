@@ -95,7 +95,6 @@ public class CreateShopDisplay {
 
             ShopManager.addItem(null, 0, item, itemCount, event.getPos(), event.getEntity().getUUID());
             TargetDataStorage.save(event.getLevel().getServer());
-
         }
     }
 
