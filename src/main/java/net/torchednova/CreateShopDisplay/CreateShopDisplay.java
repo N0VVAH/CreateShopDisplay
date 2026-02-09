@@ -2,21 +2,20 @@ package net.torchednova.CreateShopDisplay;
 
 
 import com.simibubi.create.content.logistics.tableCloth.TableClothBlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.ExplosionEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.torchednova.CreateShopDisplay.SaveData.TargetDataStorage;
 import net.torchednova.CreateShopDisplay.commands.ViewShops;
 import net.torchednova.CreateShopDisplay.shops.ShopManager;
 import org.slf4j.Logger;
 
-import com.simibubi.create.content.logistics.tableCloth.ShoppingListItem;
 
 import com.mojang.logging.LogUtils;
 
@@ -29,7 +28,8 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
-import java.lang.reflect.Field;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -79,26 +79,29 @@ public class CreateShopDisplay {
                 TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("create", "table_cloths"));
         if (event.getPlacedBlock().is(TABLE_CLOTHS))
         {
+
+
             if ( ((TableClothBlockEntity)event.getLevel().getBlockEntity(event.getPos())) == null) return;
             if ( ((TableClothBlockEntity)event.getLevel().getBlockEntity(event.getPos())).getItemsForRender() == null) return;
 
+
             TableClothBlockEntity tbce = ((TableClothBlockEntity) event.getLevel().getBlockEntity(event.getPos()));
+
 
             assert tbce != null;
             String item = tbce.getItemsForRender().getFirst().getItemHolder().getKey().location().toString();
-            LOGGER.info(item);
             int itemCount = tbce.getItemsForRender().getFirst().getCount();
+
 
             ShopManager.addItem(null, 0, item, itemCount, event.getPos(), event.getEntity().getUUID());
             TargetDataStorage.save(event.getLevel().getServer());
+
         }
     }
 
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event)
     {
-
-
         TagKey<Block> TABLE_CLOTHS =
                 TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("create", "table_cloths"));
 
@@ -110,14 +113,21 @@ public class CreateShopDisplay {
 
         LOGGER.info(event.getPos().getX() + " | " + event.getPos().getY() + " | " + event.getPos().getZ());
 
-        if (ShopManager.shopExists(event.getPos()))
-        {
-            ShopManager.removeShop(event.getPos());
-        }
+        ShopManager.removeShop(event.getPos());
+
         TargetDataStorage.save(event.getLevel().getServer());
 
     }
 
+    @SubscribeEvent
+    public void explosionEvent(ExplosionEvent.Detonate event)
+    {
+        List<BlockPos> poss = event.getExplosion().getToBlow();
+        for (int i = 0; i < poss.size(); i++) {
+            ShopManager.removeShop(poss.get(i));
+        }
+        TargetDataStorage.save(event.getLevel().getServer());
+    }
 
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

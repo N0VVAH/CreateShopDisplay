@@ -61,7 +61,6 @@ public class ShopManager {
 
     public static boolean shopExists(BlockPos pos)
     {
-
         for (int i = 0; i < stores.size(); i++)
         {
             for (int ii = 0; ii < stores.size(); ii++) {
@@ -74,11 +73,10 @@ public class ShopManager {
 
     public static void removeShop(BlockPos pos)
     {
-        for (int i =0; i < stores.size(); i++)
+        for (int i = 0; i < stores.size(); i++)
         {
-            for (int ii = 0; ii < stores.size(); ii++) {
+            for (int ii = 0; ii < stores.get(i).items.size(); ii++) {
                 if (stores.get(i).items.get(ii).pos.equals(pos)) {
-
                     stores.get(i).items.remove(ii);
                     return;
                 }

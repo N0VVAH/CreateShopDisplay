@@ -33,6 +33,7 @@ public class CreateShopMenu extends ChestMenu {
 
     private boolean inShop = false;
     private int shopPageNum = 1;
+    private shops curShop = null;
 
     public CreateShopMenu (int id, Inventory playerInventory, SimpleContainer cont)
     {
@@ -117,7 +118,7 @@ public class CreateShopMenu extends ChestMenu {
             ItemLore im = new ItemLore(List.of(Utils.Chat("&fPos: " + pos)));
             is.set(DataComponents.LORE, im);
             is.set(CustomComponent.STRING_ID, id[1]);
-            this.container.setItem(i, is);
+            this.container.setItem(i - ((shopPageNum - 1) * 36), is);
         }
     }
 
@@ -139,26 +140,26 @@ public class CreateShopMenu extends ChestMenu {
         if (name.isEmpty()) return;
         if (player.getServer() == null) return;
         //CreateShopDisplay.LOGGER.info();
-        CreateShopDisplay.LOGGER.info(name);
-        CreateShopDisplay.LOGGER.info(String.valueOf(name.length()));
-        if (name.equalsIgnoreCase("Next") && (ShopManager.stores.size() / 35) + 1  > pagenum)
+        if (name.equalsIgnoreCase("Next"))
         {
-            if (inShop)
+            if (inShop && (curShop.items.size() / 35) + 1  > shopPageNum)
             {
-
+                shopPageNum++;
+                displayShopPage(curShop);
             }
-            else {
+            else if (inShop == false && (ShopManager.stores.size() / 35) + 1  > pagenum) {
                 pagenum++;
                 displayPage(player.getServer());
             }
         }
-        else if (name.equalsIgnoreCase("Previous") && (pagenum > 1))
+        else if (name.equalsIgnoreCase("Previous"))
         {
-            if (inShop)
+            if (inShop && shopPageNum > 1)
             {
-
+                shopPageNum--;
+                displayShopPage(curShop);
             }
-            else {
+            else if (pagenum > 1) {
                 pagenum--;
                 displayPage(player.getServer());
             }
@@ -168,21 +169,21 @@ public class CreateShopMenu extends ChestMenu {
             if (inShop == true)
             {
                 inShop = false;
+                curShop = null;
                 displayPage(player.getServer());
             }
         }
         else {
             if (inShop == false)
             {
-                CreateShopDisplay.LOGGER.info(this.container.getItem(slotIndex).get(DataComponents.ITEM_NAME).getString());
-                CreateShopDisplay.LOGGER.info(String.valueOf(player.getServer().getPlayerList().getPlayerByName(this.container.getItem(slotIndex).get(DataComponents.ITEM_NAME).getString())));
                 shops shop = ShopManager.getShop(player.getServer().getPlayerList().getPlayerByName(this.container.getItem(slotIndex).get(DataComponents.ITEM_NAME).getString()).getUUID());
                 if (shop == null)
                 {
-                    CreateShopDisplay.LOGGER.info("Error couldn't find shop");
+                    CreateShopDisplay.LOGGER.error("Error couldn't find shop");
                     return;
                 }
                 inShop = true;
+                curShop = shop;
                 displayShopPage(shop);
             }
         }
